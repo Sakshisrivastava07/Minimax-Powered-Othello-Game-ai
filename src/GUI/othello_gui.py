@@ -13,13 +13,15 @@ GREEN_COLOR = (0, 128, 0)
 
 
 class OthelloGUI:
-    def __init__(self, player_mode="friend"):
-        """
-        A graphical user interface (GUI) for playing the Othello game.
-
-        Args:
-            player_mode (str): The mode of the game, either "friend" or "ai" (default is "friend").
-        """
+    def __init__(self, player_mode="human", difficulty="medium"):
+        self.player_mode = player_mode
+        self.difficulty = difficulty
+        if self.difficulty == "easy":
+            self.depth = 2
+        elif self.difficulty == "medium":
+            self.depth = 3
+        else:
+            self.depth = 5
         self.win = self.initialize_pygame()
         self.game = OthelloGame(player_mode=player_mode)
         self.message_font = pygame.font.SysFont(None, 24)
@@ -170,7 +172,7 @@ class OthelloGUI:
             if self.game.player_mode == "ai" and self.game.current_player == -1:
                 self.message = "AI is thinking..."
                 self.draw_board()  # Display the thinking message
-                ai_move = get_best_move(self.game)
+                ai_move = get_best_move(self.game, self.depth)
                 pygame.time.delay(500)  # Wait for a short time to show the message
                 self.game.make_move(*ai_move)
 
