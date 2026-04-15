@@ -31,7 +31,7 @@ class OthelloGUI:
     def __init__(self, player_mode="human", difficulty="medium"):
         self.player_mode = player_mode
         self.difficulty  = difficulty
-        self.depth = {"easy": 2, "medium": 3, "hard": 5}.get(difficulty, 3)
+        self.depth = {"easy": 1, "medium": 3, "hard": 5}.get(difficulty, 3)
  
         self.win = self._init_pygame()
         self.game = OthelloGame(player_mode=player_mode)
@@ -253,19 +253,29 @@ class OthelloGUI:
     def run_game(self, return_to_menu_callback=None):
         while not self.game.is_game_over():
             self.handle_input(return_to_menu_callback)
+
+            if self.game.is_game_over():
+                break
+
+            if not self.game.get_valid_moves():
+                skipped_player = self.game.current_player
+                self.game.current_player *= -1
+                skipped_name = "Black" if skipped_player == 1 else "White"
+                self.message = f"{skipped_name} has no valid moves. Turn skipped."
+                self.draw_board()
+                pygame.time.delay(700)
+                self.message = ""
+                continue
  
             if self.game.player_mode == "ai" and self.game.current_player == -1:
                 self.message = "AI is thinking…"
                 self.draw_board()
-                # move = get_best_move(self.game, self.depth)
-                # pygame.time.delay(300)
-                # self.game.make_move(*move)
                 move = get_best_move(self.game, self.depth)
                 pygame.time.delay(300)
                 if move is not None:
                     self.game.make_move(*move)
                 else:
-        # AI has no valid moves, skip its turn
+                    # AI has no valid moves, skip its turn
                     self.game.current_player *= -1
                 self.message = ""
  

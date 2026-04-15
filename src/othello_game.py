@@ -55,6 +55,27 @@ class OthelloGame:
 
         return False
 
+    def has_valid_move(self, player):
+        """
+        Check whether the given player has at least one valid move.
+
+        Args:
+            player (int): The player to check (1 for black, -1 for white).
+
+        Returns:
+            bool: True if the player has any valid move, False otherwise.
+        """
+        original_player = self.current_player
+        self.current_player = player
+        try:
+            for row in range(8):
+                for col in range(8):
+                    if self.is_valid_move(row, col):
+                        return True
+            return False
+        finally:
+            self.current_player = original_player
+
     def flip_disks(self, row, col):
         """
         Flip the opponent's disks after placing a disk at the given position.
@@ -110,8 +131,9 @@ class OthelloGame:
         Returns:
             bool: True if the game is over, False otherwise.
         """
-        return not self.get_valid_moves() or all(
-            all(cell != 0 for cell in row) for row in self.board
+        board_full = all(all(cell != 0 for cell in row) for row in self.board)
+        return board_full or (
+            not self.has_valid_move(1) and not self.has_valid_move(-1)
         )
 
     def get_winner(self):
